@@ -180,8 +180,6 @@ close(IN);
 
 ## end header format 
 
-print "### STARTING $analysis ANALYSIS ### \n\n";
-
 ## processing stage for selected analysis type
 if($analysis eq "co"){
 	&co_occurence($rHoH);
@@ -519,8 +517,7 @@ foreach my $ctgid (keys %$rHoH){
 ## OUTPUT :: metadata tags for represtentative clusters
 
 sub process {
-  print "Results are now being processed into a cytoscape format ...\n";
-  sleep 1;
+
   my %cyto_results = %{$_[0]};
 
   foreach my $a (keys %cyto_results) {
@@ -541,8 +538,7 @@ sub process {
 	     }
     }
   }
-  print "Process finished ...\n\n";
-  sleep 1;
+ 
 }
 #### METADATA SUB ####
 ## INPUT  :: array of orfs 
@@ -550,8 +546,6 @@ sub process {
 
 sub metadata {
 
-print "Metadata tags are being assigned to cd-hit results for $analysis analysis ...\n";
-sleep 1;
 my %orf = %{$_[0]};
 
 open(META,"<$metadata") || die "\n Cannot open the infile: $infile\n";
@@ -601,14 +595,8 @@ close(META);
 	}
      }
 
-print "Metadata tag assignment finished ...\n";
-sleep 1;
 }
 
 ########################SUBROUTINES END#################################
-my $end_run = time();
-my $run_time = $end_run - $^T;
-
-print "### FINISHED ANALYSIS in $run_time seconds ### \n";
 
 exit 0;
