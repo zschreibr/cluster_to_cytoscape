@@ -34,7 +34,7 @@ B<--help,-h>
         Tab file that contains various ORF ids and metadata from selected xml files. 
 
 =head1  CONTACT
-        Zach Schreiber @ zschreib[at]gmail[dot]com
+        Zach Schreiber @ zschreibr[at]gmail[dot]com
 
 =head1 EXAMPLE
 

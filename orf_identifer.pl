@@ -44,7 +44,7 @@ B<--help,-h>
 	Source/Target/Edge interactions along with assigned metadata tags.
 
 =head1  CONTACT
-        Zach Schreiber @ zschreib[at]gmail[dot]com
+        Zach Schreiber @ zschreibr[at]gmail[dot]com
 
 =head1 EXAMPLE
 	orf_identifier.pl -i1=clusterfile.clstr -i2=metadata.txt -o=/home/output/ -db=ACLAME -type=prox_D -oc=8
