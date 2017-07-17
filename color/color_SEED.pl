@@ -5,7 +5,7 @@ use strict;
 use DBI;
 
 ## DATABASE INFO ###
-open(ACCESS_INFO, "/home/zschreib/mmi_60/id_to_xml/Metadata/.accessDB") || die "Can't access login credentials";
+open(ACCESS_INFO, ">") || die "Can't access login credentials";
 # assign the values in the accessDB file to the variables
 my $userid = <ACCESS_INFO>;
 my $passwd = <ACCESS_INFO>;
