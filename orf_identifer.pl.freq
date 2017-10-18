@@ -58,6 +58,7 @@ use Data::Dumper;
 use Getopt::Long qw(:config no_ignore_case no_auto_abbrev pass_through);
 use List::Util qw(min max);
 use File::Basename;
+use List::Util 'sum';
 
 my %options = ();
 my $results = GetOptions (\%options,
@@ -107,13 +108,15 @@ my %HoH = ();  ## Hash of hashes for orfs along a contig
 ##                            'CLUSTER' => '4'
 ##                           }
 
-my %orfs = ();         # captures each orf in a cluster
+my %orfs = ();	       # captures each orf in a cluster
 my $rHoH = \%HoH;      #contig data
 my %cyto_results = (); #cytoscape results
 my %metadata = ();     #metadata tags
 
+
+
 open(OUTPUT, ">$out_path" . $filename) or die "Could not open file '$filename' $!";
-my $name = "Source\tTarget\tEdge\tORF_name\ttop_hit_description\t";
+my $name = "Source\tTarget\tEdge\tFreq\tORF_name\ttop_hit_description\t";
 
 ##Applies proper header to metadata file based off input DB
 if($db =~ /aclame/i){
@@ -164,13 +167,8 @@ while(<IN>) {
         $orf_id = pop(@a);                 #orf position on the contig => 1
         $stop_id = pop(@a);                #stopping position of orf on contig => 430
         $start_id = pop(@a);               #starting position of orf on contig => 23
-    	my $con = pop(@a);
-	my $fakemgol = pop(@a);
-	$fakemgol =~ s/\d//g;
-	$fakemgol =~ s/[\-]//g;
-	#$contig_id = join("_", @a);        #contig id => ABC_ctg12352124134
-	$contig_id = $fakemgol . "_" . $con;        
-#	print $contig_id . "\n";
+        $contig_id = join("_", @a);        #contig id => ABC_ctg12352124134
+        
 	$HoH { $contig_id }{ 'POSITION' }[$orf_id-1] = $orf_id;
 	$HoH { $contig_id }{ 'CLUSTER' }[$orf_id-1]  = $cluster_id;
 	$HoH { $contig_id }{ 'START' }[$orf_id-1]    = $start_id;
@@ -179,7 +177,6 @@ while(<IN>) {
 }
 
 close(IN);
-
 ## end input parser 
 
 ## end header format 
@@ -520,16 +517,19 @@ foreach my $ctgid (keys %$rHoH){
 #### PROCESSING SUB  ####
 ## INPUT  ::  analysis results
 ## OUTPUT :: cluster number along with how often that cluster pair matches analysis type
-## OUTPUT :: metadata tags for represtentative clusters
+## OUTPUT :: metadata tags for represtentative cluster
+
 
 sub process {
   print "Results are now being processed into a cytoscape format ...\n\n";
   sleep 1;
-  my %cyto_results = %{$_[0]};
+  my $count = 0;
+  my $freq;
 
+  my %cyto_results = %{$_[0]};
   foreach my $a (keys %cyto_results) {
      foreach my $b (keys %{$cyto_results{$a}}){
-             if ($cyto_results{$a}{$b} > 0 ){
+             if ($cyto_results{$a}{$b} > 1 ){
                          if(exists $metadata{$a}){
 				if(exists $metadata{$b}){
                                         foreach my $data_a (min keys %{$metadata{$a}}){
@@ -547,6 +547,7 @@ sub process {
   }
   print "Process finished ...\n\n";
   sleep 1;
+
 }
 #### METADATA SUB ####
 ## INPUT  :: array of orfs 
@@ -568,7 +569,6 @@ open(META,"<$metadata") || die "\n Cannot open the infile: $infile\n";
 		      shift @vals;
 		      shift @vals;  ##removes header and evalue from data
 		      $eval{$header}{$evalue} = join("\t", @vals);
-		      
      }
 
 close(META);
@@ -577,14 +577,6 @@ close(META);
 	foreach (@{$orfs{$orf}}){
 	  my $count = scalar(@{$orfs{$orf}}); #counts number of ORFs in each cluster
 	  my $new = $_;
-	  my @arr = split ("_", $new);
-          my $front = shift(@arr);
-	  my $ctg = shift(@arr);
-	  $front =~ s/\d//g;
-          $front =~ s/[\-]//g;
-	  my $tail = join("_", @arr);
-	  $new = $front . "_" . $ctg . "_" . $tail;
-
 	     if(exists $eval{$new}){
 		  foreach my $eval (keys %{$eval{$new}}){
 			#Saves ORF id and eval into metadata file 
